@@ -48,5 +48,11 @@ public class UserController: ControllerBase
         }
 
     }
-
+    
+    [HttpGet("hi")]
+    public IActionResult Get()
+    {
+        var message = "Hello World"; // ← Put breakpoint here
+        return Ok(message);
+    }
 }
