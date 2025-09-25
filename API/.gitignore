@@ -1,0 +1,33 @@
+# Build results
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.idea/
+.vs/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# macOS
+.DS_Store
+
+# Rider
+.idea/
+*.sln.iml
+
+# appsettings with secrets (if you add passwords later)
+appsettings.Development.json
