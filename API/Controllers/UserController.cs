@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using API.Models;
-
+using Serilog;
 namespace API.Controllers;
 
 [ApiController]
@@ -20,37 +20,33 @@ public class UserController: ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
-        if (request.Password != request.ConfirmPassword)
-            return BadRequest(new { message = "Passwords do not match" });
-
-        var user = new ApplicationUser
+        try
         {
-            UserName = request.Email,
-            Email = request.Email,
-            FirstName = request.FirstName,
-            LastName = request.LastName
-        };
+            var user = new ApplicationUser
+            {
+                UserName = request.Email,
+                Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName
+            };
 
-        var result = await _userManager.CreateAsync(user, request.Password);
+            var result = await _userManager.CreateAsync(user, request.Password);
 
-        if (result.Succeeded)
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                Log.Information("User registered successfully: {Email}", request.Email);
+                return Ok();
+            }
+            Log.Warning("Registration failed for {Email}: {Errors}", request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+            return BadRequest();
+        }
+        catch (Exception ex)
         {
-            await _signInManager.SignInAsync(user, isPersistent: false);
-            return Ok(new 
-            { 
-                message = "Registration successful",
-                userId = user.Id,
-                email = user.Email,
-                firstName = user.FirstName,
-                lastName = user.LastName
-            });
+            Log.Error(ex, "Error during registration for {Email}", request.Email);
+            return StatusCode(500);
         }
 
-        return BadRequest(new 
-        { 
-            message = "Registration failed",
-            errors = result.Errors.Select(e => e.Description)
-        });
     }
 
 }

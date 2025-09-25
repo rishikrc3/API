@@ -2,11 +2,17 @@ using Microsoft.EntityFrameworkCore;
 using API.Data;
 using Microsoft.AspNetCore.Identity;
 using API.Models;
+using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
-
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .MinimumLevel.Debug()
+    .CreateLogger();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
        
